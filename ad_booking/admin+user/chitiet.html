@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Booking Interface</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <style>
+      /* General Styles */
+      body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+}
+
+.container {
+  max-width: 950px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Hotel Info */
+.hotel-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin: 20px auto;
+  width: 100%;
+}
+
+.hotel-details {
+  flex: 2;
+}
+
+.ratings {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.stars {
+  color: #f5c518;
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+
+.features {
+  display: flex;
+  gap: 10px;
+}
+
+.feature {
+  font-size: 0.9em;
+  background: #ffeeba;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #333333;
+}
+
+.feature.green {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.hotel-name {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 5px 0;
+  color: #333333;
+}
+
+.address {
+  font-size: 0.9em;
+  color: #666666;
+}
+
+.booking-action {
+  flex: 1;
+  text-align: right;
+}
+
+.btn {
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.price-info {
+  font-size: 0.9em;
+  margin-top: 10px;
+  color: #444444;
+}
+
+.price {
+  font-weight: bold;
+  color: #000000;
+}
+
+.guarantee {
+  font-size: 0.85em;
+  color: #007bff;
+  margin-top: 5px;
+}
+
+/* Availability Section */
+.availability {
+  margin-bottom: 20px;
+}
+
+.date-picker label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.date-picker input,
+.date-picker select {
+  margin: 0 10px 10px 0;
+  padding: 8px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+
+.button {
+  background-color: #0071c2;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+/* Room Table */
+/* Room Table Styling */
+#room_table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+#room_table th {
+  background-color: #0071c2;
+  color: #ffffff;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#room_table td {
+  border-bottom: 1px solid #dddddd;
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+#room_table td img {
+  width: 100px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+#room_table td span {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+#room_table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#room_table tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.3s ease;
+}
+
+#room_table td button {
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #0071c2;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#room_table td button:hover {
+  background-color: #005ea6;
+  transform: scale(1.05);
+}
+
+
+/* Service Table */
+#review_table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#review_table th,
+#review_table td {
+  border: 1px solid #dddddd;
+  padding: 10px;
+  text-align: left;
+}
+
+#review_table th {
+  background-color: #0071c2;
+  color: #ffffff;
+}
+
+#review_table td {
+  background-color: #f9f9f9;
+}
+
+#review_table tr:hover {
+  background-color: #e6f7ff;
+}
+
+/* Reviews */
+.reviews {
+  margin-top: 20px;
+}
+
+.rating-box {
+  display: inline-block;
+  background-color: #0071c2;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+
+.rating-text {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 5px;
+  color: #ff2121;
+}
+
+.review-category {
+  margin-top: 10px;
+}
+
+.review-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.review-item span:first-child {
+  min-width: 150px;
+  text-align: left;
+}
+
+.review-item span:last-child {
+  min-width: 40px;
+  text-align: right;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  max-width: 200px;
+  height: 6px;
+  background-color: #e4e4e4;
+  border-radius: 3px;
+  margin: 0 20px;
+  position: relative;
+}
+
+.progress {
+  height: 100%;
+  background-color: #0071c2;
+  border-radius: 3px;
+  width: 50%;
+}
+
+/* Image Gallery */
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.image-large {
+  flex: 2;
+}
+
+.image-large img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.image-small {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-small img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+/* Navigation Button */
+.nx {
+  background-color: #0071c2;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.nx a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nx:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .hotel-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-picker {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .date-picker input,
+  .date-picker select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="hotel-info">
+        <div class="hotel-details">
+          <div class="ratings">
+            <span class="stars">5.0 ★</span>
+            <span class="features">
+              <span class="feature">🚖 Xe đưa đón sân bay</span>
+              <span class="feature green">🚖 Có taxi miễn phí</span>
+            </span>
+          </div>
+          <h2 class="hotel-name" id="display-hotel-name"></h2>
+          
+          <h1 class="address" id="display-vitri">
+        
+          </h1>
+          <p class="address" id="display-mota">
+        
+          </p>
+          
+        </div>
+        <div class="booking-action">
+          <button class="btn book-now" onclick="datngay()">
+            <i class="fa fa-shopping-cart"  ></i> Đặt ngay
+          </button>
+          <p></p>
+          <button class="btn return-now" onclick="trangchu()">
+            <i class=""  ></i> Trang chủ
+          </button>
+          <p class="price-info">
+            <span class="price" id="display"></span>
+          </p>
+          <p class="guarantee">🎯 Chúng Tôi Luôn Khớp Giá!</p>
+        </div>
+      </div>
+      <div class="image-gallery">
+        <div class="image-large">
+          <img
+            src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/427320055.jpg?k=d761581a02e01f7842c4964e1d187882d737d6592f9ffdcc982141ecd61f265f&o="
+            alt="Image 1"
+          />
+        </div>
+        <div class="image-small">
+          <img
+            src="https://cf.bstatic.com/xdata/images/hotel/max500/585565008.jpg?k=c916e5c83f61cdbcb3ff0ae707b8b9412b8aee04654d4f9c06ccc60dc9651e71&o="
+            alt="Image 2"
+          />
+          <img
+            src="https://cf.bstatic.com/xdata/images/hotel/max500/100500454.jpg?k=04f3a54654074afa801d6d66c88254f9989b85f6fb1e73436659eeae39943031&o="
+            alt="Image 3"
+          />
+        </div>
+      </div>
+
+      <!-- Phòng trống Section -->
+      <div class="availability">
+        <h2 class="availability-text" style="margin-top: 5%">Phòng trống</h2>
+        <div class="date-picker">
+          <label for="checkin">Ngày nhận phòng</label>
+          <input type="date" id="checkin" />
+          <label for="checkout">Ngày trả phòng</label>
+          <input type="date" id="checkout" />
+          <button class="button"><i class="fa fa-search"></i> Tìm</button>
+        </div>
+      </div>
+
+      <!-- Room Options -->
+      <table id="room_table">
+        <thead>
+          <tr>
+            <th>Tên phòng</th>
+            <th>Loại Phòng</th>
+            <th>Giá</th>
+            <th>Đặt phòng</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+
+      <table id="review_table">
+        <h2 class="review-text" style="margin-top: 20px">
+          Các nhận xét nổi bật
+        </h2>
+        <thead>
+          <tr>
+            <th>Tên người nhận xét</th>
+            <th>nhận xét</th>
+            <th>Đánh giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+
+      <div class="reviews">
+        <h2>Đánh giá của khách</h2>
+
+        <p>
+          <span class="rating-box">5.0 ★</span>
+          <span class="rating-text"> Tốt</span> · 3.545 đánh giá
+        </p>
+        <h3>Hạng mục:</h3>
+        <div class="review-category">
+          <div class="review-item">
+            <span>Nhân viên </span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 87%"></div>
+            </div>
+            <span>8,7</span>
+          </div>
+          <div class="review-item">
+            <span>Thoải mái</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 78%"></div>
+            </div>
+            <span>7,8</span>
+          </div>
+          <div class="review-item">
+            <span>WiFi miễn phí</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 76%"></div>
+            </div>
+            <span>7,6</span>
+          </div>
+          <div class="review-item">
+            <span>Tiện nghi</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 75%"></div>
+            </div>
+            <span>7,5</span>
+          </div>
+          <div class="review-item">
+            <span>Đáng giá tiền</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 80%"></div>
+            </div>
+            <span>8,0</span>
+          </div>
+          <div class="review-item">
+            <span>Địa điểm</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 89%"></div>
+            </div>
+            <span>8,9</span>
+          </div>
+          <div class="review-item">
+            <span>Sạch sẽ</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 78%"></div>
+            </div>
+            <span>7,8</span>
+          </div>
+        </div>
+      </div>
+      <button class="nx"><a href="nhanxet.html">Nhận xét</a></button>
+    </div>
+   
+  </body>
+  <script>
+    const apiHs = "https://localhost:7246/api/Homestays";
+    const apiTableRoom = "https://localhost:7246/api/Rooms/displayRoom_Homestay";
+    const apiReview = "https://localhost:7246/api/Reviews/Review_Homestay";
+    
+    const imageUrls = [
+      "1.jpeg", "1caibe.jpg", "1cantho.jpg", "1catba.jpg", "1chaudoc.jpg",
+      "1dienbienphu.jpg", "1hagiang.jpg", "1haiphong.jpg", "1halong.jpg",
+      "1hoian.jpg", "1hue.jpg", "1maichau.jpg", "1ninhbinh.jpg", "1phongnha.jpg",
+      "1quangninh.jpg", "1samson.jpg", "1sapa.jpg", "1tphcm.jpg",
+      "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpeg", "7.jpeg", "8.jpeg",
+      "9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg", "14.jpeg", "15.jpeg"
+    ];
+
+    //chọn ngẫu nhiên 3 ảnh
+    // Hàm chọn ngẫu nhiên 3 ảnh không lặp
+    function getRandomImages(imageArray, count) {
+      const shuffled = imageArray.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+    async function load_data(){
+      idhs = localStorage.getItem('homestayId');
+
+      
+
+      // lấy phòng
+      try{
+        const response = await fetch(`${apiHs}/${idhs}`);
+        
+        if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
+            const hs = await response.json();
+
+            document.getElementById("display-hotel-name").innerText = hs.name;
+            document.getElementById("display-vitri").innerText =  hs.ward +", " + hs.district +", "+ hs.province;
+            document.getElementById("display-mota").innerText = hs.description;
+          
+            // Chọn ngẫu nhiên 3 ảnh không lặp
+              const randomImages = getRandomImages(imageUrls, 3);
+
+          // Cập nhật ảnh lớn
+          document.querySelector(".image-large img").src = randomImages[0];
+          document.querySelector(".image-large img").alt = `Image from ${randomImages[0]}`;
+
+          // Cập nhật ảnh nhỏ
+          const smallImages = document.querySelectorAll(".image-small img");
+          smallImages[0].src = randomImages[1];
+          smallImages[0].alt = `Image from ${randomImages[1]}`;
+          smallImages[1].src = randomImages[2];
+          smallImages[1].alt = `Image from ${randomImages[2]}`;
+          
+          }
+      catch(error){
+        console.error("Lỗi khi lấy dữ liệu phòng:", error);
+                alert("Không thể lấy dữ liệu phòng.");
+      }
+      // hiển thị review
+      const apiUserName = "https://localhost:7246/api/Users";
+
+      try {
+        // Gọi API nhận xét
+        const respone_review = await fetch(`${apiReview}?id=${idhs}`);
+        if (!respone_review.ok) {
+          throw new Error(`HTTP error! status: ${respone_review.status}`);
+        }
+
+        // Lấy dữ liệu nhận xét
+        const review_data = await respone_review.json();
+
+        // Lấy bảng nhận xét
+        const tableBody = document
+          .getElementById("review_table")
+          .querySelector("tbody");
+
+        // Xóa nội dung bảng trước khi thêm mới
+        tableBody.innerHTML = "";
+
+        // Duyệt qua tất cả các review
+        for (let review of review_data) {
+          // Gọi API Users để lấy thông tin người dùng theo userId trong review
+          const response_username = await fetch(`${apiUserName}/${review.userId}`);
+          if (!response_username.ok) {
+            console.error(`Không tìm thấy người dùng với ID: ${review.userId}`);
+            continue; // Nếu không tìm thấy user, bỏ qua review này
+          }
+          let stars = '';
+          const rating = review.rate;
+          for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+              stars += '⭐';  // Sao đầy
+            } else {
+              stars += '☆';  // Sao trống
+            }
+          }
+          const user = await response_username.json();
+          const userName = user.fullName; // Lấy userName từ dữ liệu trả về
+
+          // Tạo dòng mới cho bảng nhận xét
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${userName}</td>  <!-- Hiển thị userName -->
+            <td>${review.comment}</td> <!-- Hiển thị nhận xét -->
+            <td>${stars}</td>    <!-- Hiển thị đánh giá -->
+          `;
+          tableBody.appendChild(row);
+        }
+      } catch (error) {
+        console.error("Không có nhận xét nào", error);
+      }
+
+      // hiển thị phòng
+      try{
+        const response_table_room = await fetch(`${apiTableRoom}?id=${idhs}`);
+        if (!response_table_room.ok) {
+          throw new Error(`HTTP error! status: ${response_table_room.status}`);
+        }
+        const roomData = await response_table_room.json();
+
+        const tableBody = document
+          .getElementById("room_table")
+          .querySelector("tbody");
+        tableBody.innerHTML = ""; // Xóa nội dung cũ trước khi thêm mới
+
+        roomData.forEach((room) => {
+          const randomImage = imageUrls[Math.floor(Math.random() * imageUrls.length)]; // Chọn ngẫu nhiên ảnh
+          const row = document.createElement("tr");
+          let loaiPhong = "";
+
+          switch (room.roomType) {
+            case 1:
+              loaiPhong = "Phòng đơn";
+              break;
+            case 2:
+              loaiPhong = "Phòng đôi";
+              break;
+            case 3:
+              loaiPhong = "Phòng ghép 1 đôi - 1 đơn";
+              break;
+            default:
+              loaiPhong = "Phòng tập trung";
+          }
+
+          row.innerHTML = `
+            <td>
+                  <img src="${randomImage}" alt="${room.roomName}" style="width: 100px; height: auto; border-radius: 5px; display: block; margin: 0 auto;" />
+                  <span>${room.roomName}</span>
+                  
+            </td>
+            <td>${loaiPhong}</td>
+          
+            <td>${room.price}</td>
+            <td>
+              <button class="button-dat" onclick= "datPhong(${room.roomId})">Đặt phòng</button>  
+            </td>
+          `;
+          localStorage.setItem('room_name',room.roomName);
+          localStorage.setItem('room_price', room.price);
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu từ API:", error);
+      }
+          }
+
+      async function datPhong(id){
+        try{
+          localStorage.setItem('room_ID', id);
+          window.location.href = "datphong.html";
+        }catch(error){
+          console.error("lỗi", error);
+          
+        }
+      }
+
+      function datngay(){
+        alert("Vui lòng chọn phòng muốn đặt bên dưới");
+      }
+
+      function trangchu(){
+        window.location.href = "user_tk.html";
+      }
+    window.onload = load_data;
+  </script>
+</html>

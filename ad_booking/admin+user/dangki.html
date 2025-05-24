@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden; /* Ngăn cuộn */
+      }
+
+      .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* Đặt ở phía sau */
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Giữ nguyên tỷ lệ video */
+      }
+
+      .register-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        position: relative; /* Để đảm bảo form nằm trên video */
+        z-index: 1; /* Đặt trên video */
+      }
+
+      .register-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .register-container input,
+      .register-container select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+
+      .register-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #0071c2;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .register-container button:hover {
+        background-color: #005fa3;
+      }
+
+      .register-container p {
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      .register-container a {
+        color: #0071c2;
+        text-decoration: none;
+      }
+
+      .register-container a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-background">
+      <video autoplay muted loop>
+        <source src="D:/cac_mon_hoc/Ki5/FINAL_HDV/PTPM_HDV/PTPM_HDV/ad_booking/ad_booking/admin+user/INTRO_DANGKI.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <div class="register-container">
+      <h2>Đăng ký</h2>
+      <form onsubmit="DangKy(event)">
+        <input type="text" id="fullName" name="fullName" placeholder="Tên đầy đủ" required />
+        <input type="text" id="userName" name="username" placeholder="Tài khoản" required />
+        <input
+          id="password"
+          type="password"
+          name="password"
+          placeholder="Mật khẩu"
+          required
+        />
+        <input type="tel" id="phone" name="phone" placeholder="Số điện thoại" required />
+        <input type="email" id="email" name="email" placeholder="Email" required />
+        <select id="gender" name="gender" required>
+          <option value="">Chọn giới tính</option>
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+          <option value="Khác">Khác</option>
+        </select>
+        <button type="submit">Đăng ký</button>
+      </form>
+      <p>Đã có tài khoản? <a href="dangnhap.html">Đăng nhập</a></p>
+    </div>
+
+    <script>
+      const apiUrlUser = "https://localhost:7246/api/Users";
+      function formatDate(dateInt) {
+        const year = Math.floor(dateInt / 10000);
+        const month = Math.floor((dateInt % 10000) / 100) - 1; // Month is 0-indexed
+        const day = dateInt % 100;
+        return new Date(year, month, day).toLocaleDateString();
+      }
+      async function DangKy(event) {
+    event.preventDefault(); // Ngăn form submit mặc định
+
+    const fullname = document.querySelector('input[name="fullName"]').value.trim();
+    const username = document.querySelector('input[name="username"]').value.trim();
+    const password = document.querySelector('input[name="password"]').value.trim();
+    const phone = document.querySelector('input[name="phone"]').value.trim();
+    const email = document.querySelector('input[name="email"]').value.trim();
+    const genderValue = document.querySelector('select[name="gender"]').value;
+
+    let gender;
+    if (genderValue === "Nam") {
+        gender = 1;
+    } else if (genderValue === "Nữ") {
+        gender = 0;
+    } else {
+        gender = 2; // Khác
+    }
+
+    // Tạo ID người dùng ngẫu nhiên từ 1000 đến 9999
+    const newId = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+    // Kiểm tra sự tồn tại của ID, số điện thoại, email, tên người dùng
+    const checkResponse = await fetch(`${apiUrlUser}/getId?id=${newId}&phoneNumber=${phone}&email=${email}&userName=${username}`);
+    
+    if (!checkResponse.ok) {
+        const errorData = await checkResponse.json();
+        alert("Đăng ký không thành công: " + errorData);
+        return; // Dừng hàm nếu có lỗi
+    }
+      var CA = formatDate(Date.now());
+      var UA = formatDate(Date.now());
+    const new_user = {
+        userId: newId,
+        userName: username,
+        password: password,
+        email: email,
+        phoneNumber: phone,
+        gender: gender,
+        fullName: fullname,
+        createdAt: Math.floor(Date.now() / 1000),
+        updatedAt: Math.floor(Date.now() / 1000),
+        role: 1,
+        avatar: "",
+    };
+
+    try {
+        const response = await fetch(apiUrlUser, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(new_user),
+        });
+
+        if (response.ok) {
+            alert("Đăng ký thành công!");
+            window.location.href = "dangnhap.html"; // Chuyển về trang đăng nhập
+        } else {
+            const errorData = await response.json();
+            alert("Trùng tên đăng nhập hoặc số điện thoại hoặc email");
+            alert("Đăng ký không thành công: " + errorData.message);
+        }
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+    }
+}
+
+    </script>
+  </body>
+</html>

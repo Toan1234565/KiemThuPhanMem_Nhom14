@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hủy Đặt Phòng</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+        background-size: 400% 400%;
+        animation: gradientBG 10s ease infinite;
+        color: #333;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      #booking_list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      #booking_list th,
+      #booking_list td {
+        padding: 15px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      #booking_list th {
+        background: linear-gradient(to right, #0071c2, #00b4d8);
+        color: #fff;
+        font-weight: bold;
+      }
+
+      #booking_list tr:nth-child(even) {
+        background: linear-gradient(to right, #f2f2f2, #e0e0e0);
+      }
+
+      .button-delete {
+        padding: 10px 20px;
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+
+      .button-delete:hover {
+        background-color: #cc0000;
+        transform: scale(1.05);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        padding: 20px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .modal-buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .confirm-button {
+        background-color: #0071c2;
+        color: white;
+      }
+
+      .confirm-button:hover {
+        background-color: #0056a3;
+        transform: scale(1.05);
+      }
+
+      .cancel-modal-button {
+        background-color: #ddd;
+        color: black;
+      }
+
+      .cancel-modal-button:hover {
+        background-color: #bbb;
+        transform: scale(1.05);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      #video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video-background" autoplay loop muted>
+      <source src="Huy_Dat_Phong.mp4" type="video/mp4" />
+      Trình duyệt của bạn không hỗ trợ video.
+    </video>
+    <h1>Quản Lý Đặt Phòng</h1>
+    <table id="booking_list">
+      <thead>
+        <tr>
+          <th>Ngày Đặt</th>
+          <th>Ngày Nhận Phòng</th>
+          <th>Ngày Trả Phòng</th>
+          <th>Giá Trị Đặt Phòng</th>
+          <th>Ảnh phòng</th>
+          <th>Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+       
+      </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="cancelModal">
+      <h2>Xác nhận hủy đặt phòng</h2>
+      <p id="modalContent"></p>
+      <div class="modal-buttons">
+        <button class="confirm-button" onclick="confirmCancellation()">
+          Xác nhận
+        </button>
+        <button class="cancel-modal-button" onclick="closeCancelModal()">
+          Hủy bỏ
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const apiUrl = "https://localhost:7246/api/Bookings";
+      const imageUrls = [
+            "1.jpeg", "1caibe.jpg", "1cantho.jpg", "1catba.jpg", "1chaudoc.jpg",
+            "1dienbienphu.jpg", "1hagiang.jpg", "1haiphong.jpg", "1halong.jpg",
+            "1hoian.jpg", "1hue.jpg", "1maichau.jpg", "1ninhbinh.jpg", "1phongnha.jpg",
+            "1quangninh.jpg", "1samson.jpg", "1sapa.jpg", "1tphcm.jpg",
+            "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpeg", "7.jpeg", "8.jpeg",
+            "9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg", "14.jpeg", "15.jpeg"
+          ];
+
+      let selectedBooking = "";
+
+      function showCancelModal(bookingName) {
+        selectedBooking = bookingName;
+        document.getElementById(
+          "modalContent"
+        ).textContent = `Bạn có chắc chắn muốn hủy đặt phòng tại ${bookingName}? Hành động này không thể hoàn tác.`;
+        document.getElementById("cancelModal").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+      }
+
+      function closeCancelModal() {
+        document.getElementById("cancelModal").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+      }
+
+      function confirmCancellation() {
+        // Thực hiện các thao tác cập nhật trạng thái
+        alert(`Đặt phòng tại ${selectedBooking} đã được hủy thành công.`);
+        closeCancelModal();
+
+        // Cập nhật trạng thái đặt phòng (mô phỏng)
+        const rows = document.querySelectorAll(".booking-list tbody tr");
+        rows.forEach((row) => {
+          if (row.cells[0].textContent === selectedBooking) {
+            row.cells[4].textContent = "Đã hủy";
+          }
+        });
+
+        // Gửi thông báo qua email/SMS (logic cần kết nối backend)
+      }
+
+      function formatLongDate(longDate) {
+              // Chuyển long thành chuỗi
+              const dateStr = longDate.toString();
+
+              // Tách các phần của chuỗi (YYYYMMDD)
+              const year = dateStr.substring(0, 4); // 2024
+              const month = dateStr.substring(4, 6); // 10
+              const day = dateStr.substring(6, 8); // 01
+
+              // Kết hợp thành định dạng DD/MM/YYYY
+              return `${day}/${month}/${year}`;
+            }
+      // apiroom => tên room, giá
+      const apiRoom = "https://localhost:7246/api/Rooms/booking_id";
+      const apiHs = "https://localhost:7246/api/Homestays";
+      const apiBookingbyId = "https://localhost:7246/api/Bookings";
+      const apiIdusbyUsname = "https://localhost:7246/api/Users/getid_username";
+      //hiện ra list booking theo userID
+      const apiBooking_userId = "https://localhost:7246/api/Bookings/booking_userId";
+
+      async function Booking_display() {
+        //const apiRoom = "https://localhost:7246/api/Rooms/booking_id";
+
+        // láy ra tên phòng
+
+        // lấy id user
+        var us_username = localStorage.getItem('button_username');
+
+        var idus = 0;
+        try{
+          
+          const reponseUs = await fetch(`${apiIdusbyUsname}?username2=${us_username}`);
+          const user = await reponseUs.json();
+
+          idus = user.userId;
+          console.log("idus: " + idus);
+          
+          
+        }catch(error){
+          console.error("lỗi", error);
+        }
+        // hiển thị thông tin bookings
+        const response_booking_display = await fetch(`${apiBooking_userId}?idus=${idus}`);
+
+        if (!response_booking_display.ok)
+          throw new Error(`HTTP error! status: ${response_booking_display.status}`);
+        const booking_display = await response_booking_display.json();
+
+        
+        const tableBody = document
+                  .getElementById("booking_list")
+                  .querySelector("tbody");
+                tableBody.innerHTML = "";
+                for (const booking of booking_display) {
+            const checkInDate2 = formatLongDate(booking.checkInDate);
+            const checkOutDate2 = formatLongDate(booking.checkOutDate);
+            const createdat = formatLongDate(booking.createdAt);
+            const roomId = booking.bookingId; // Giả sử bookingId là id của phòng
+
+            const randomImage = imageUrls[Math.floor(Math.random() * imageUrls.length)]; // Chọn ngẫu nhiên ảnh
+            // Gọi API để lấy thông tin phòng
+            const response_room = await fetch(`${apiRoom}?id=${roomId}`);
+            const room = await response_room.json();
+                  
+            const name = room.roomName;
+                  
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${createdat}</td>
+                <td>${checkInDate2}</td>
+                <td>${checkOutDate2}</td>
+                <td>${booking.totalPrice + "$"}</td>
+                <td>
+                <img src="${randomImage}" alt="${room.roomName}" style="width: 100px; height: auto; border-radius: 5px; display: block; margin: 0 auto;" />
+                  <span></span>
+                <span>${"Tên người đặt:"+ us_username}</span> </td>
+                <td>
+                    <button class="button-delete" onclick="deleteBooking(${booking.bookingId})">Hủy đặt phòng</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+      }
+
+      async function deleteBooking(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa đặt phòng này không?")) {
+          console.log(id);
+          try {
+            const response = await fetch(`${apiUrl}/${id}`, {
+              method: "DELETE",
+            });
+            if (response.ok) {
+              alert("Đặt phòng đã được xóa thành công!");
+              Booking_display();
+            } else {
+              alert("Lỗi khi xóa đặt phòng.");
+            }
+          } catch (error) {
+            console.error("Lỗi khi xóa đặt phòng:", error);
+            
+          }
+        }
+      }
+      Booking_display();
+    </script>
+  </body>
+</html>

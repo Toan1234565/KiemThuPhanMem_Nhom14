@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin GoatBooking - Quản Lý Đặt Phòng</title>
+<link
+  rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #80deea); /* Gradient background */
+  }
+  .sidebar {
+    height: 100vh;
+    background: linear-gradient(to bottom, #00796b, #004d40); /* Gradient for sidebar */
+    color: #fff;
+    position: fixed;
+    width: 250px;
+    overflow-y: auto;
+  }
+  .content {
+    margin-left: 250px;
+    padding: 20px;
+  }
+  h2 {
+    color: #004d40; /* Darker Teal */
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #00796b;
+    padding: 12px;
+    text-align: center;
+  }
+  th {
+    background: linear-gradient(to right, #004d40, #00796b); /* Gradient for table header */
+    color: white;
+  }
+  .button-add {
+    background: linear-gradient(to right, #4caf50, #388e3c); /* Gradient for add button */
+    color: white;
+  }
+  .button-delete {
+    background: linear-gradient(to right, #f44336, #c62828); /* Gradient for delete button */
+    color: white;
+  }
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #00796b;
+  }
+</style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h3 class="text-center mb-4">Admin GoatBooking</h3>
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="#"><i class="fas fa-home"></i> Trang chủ</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#"><i class="fas fa-book"></i> Đặt phòng</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+    </li>
+  </ul>
+</div>
+
+<!-- Content -->
+<div class="content">
+  <h2>Quản Lý Đặt Phòng</h2>
+  <button class="button-add" onclick="showAddForm()">Thêm Đặt Phòng</button>
+  <table id="bookingTable">
+    <thead>
+      <tr>
+        <th>Booking ID</th>
+        <th>Ngày Nhận Phòng</th>
+        <th>Ngày Trả Phòng</th>
+        <th>Giá Đặt Cọc ($)</th>
+        <th>Tổng Giá ($)</th>
+        <th>Trạng Thái</th>
+        <th>Ngày Tạo</th>
+        <th>Ngày Cập Nhật</th>
+        <th>Thao Tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dữ liệu sẽ được chèn vào đây bằng JavaScript -->
+    </tbody>
+  </table>
+
+  <!-- Add Booking Form -->
+  <div id="addBookingForm" style="display:none;">
+    <h3>Thêm Đặt Phòng Mới</h3>
+    <label for="checkIn">Ngày Nhận Phòng</label>
+    <input type="date" id="checkIn" />
+    <label for="checkOut">Ngày Trả Phòng</label>
+    <input type="date" id="checkOut" />
+    <label for="depositPrice">Giá Đặt Cọc ($)</label>
+    <input type="number" id="depositPrice" />
+    <label for="totalPrice">Tổng Giá ($)</label>
+    <input type="number" id="totalPrice" />
+    <label for="status">Trạng Thái</label>
+    <input type="number" id="status" />
+    <button onclick="addBooking()">Thêm</button>
+    <button onclick="hideAddForm()">Đóng</button>
+  </div>
+
+  <!-- Edit Booking Form -->
+  <div id="editBookingForm" style="display:none;">
+    <h3>Sửa Đặt Phòng</h3>
+    <input type="hidden" id="editBookingId" />
+    <label for="editCheckIn">Ngày Nhận Phòng</label>
+    <input type="date" id="editCheckIn" />
+    <label for="editCheckOut">Ngày Trả Phòng</label>
+    <input type="date" id="editCheckOut" />
+    <label for="editDepositPrice">Giá Đặt Cọc ($)</label>
+    <input type="number" id="editDepositPrice" />
+    <label for="editTotalPrice">Tổng Giá ($)</label>
+    <input type="number" id="editTotalPrice" />
+    <label for="editStatus">Trạng Thái</label>
+    <input type="number" id="editStatus" />
+    <button onclick="saveBooking()">Lưu</button>
+    <button onclick="hideEditForm()">Đóng</button>
+  </div>
+
+  <div class="footer">
+    <p>Copyright © 2024 GoatBooking. All rights reserved.</p>
+  </div>
+</div>
+
+<script>
+  const apiUrl = "https://localhost:7246/api/Bookings";
+  let currentBookingId = null;
+
+  // Fetch and display bookings
+  async function fetchBookings() {
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+
+      const tableBody = document.getElementById("bookingTable").querySelector("tbody");
+      tableBody.innerHTML = "";
+      data.forEach((booking) => {
+        const createdAt = formatDate(booking.createdAt);
+        const updatedAt = formatDate(booking.updatedAt);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${booking.bookingId}</td>
+          <td>${formatDate(booking.checkInDate)}</td>
+          <td>${formatDate(booking.checkOutDate)}</td>
+          <td>${booking.depositPrice}</td>
+          <td>${booking.totalPrice}</td>
+          <td>${booking.status}</td>
+          <td>${createdAt}</td>
+          <td>${updatedAt}</td>
+          <td>
+            <button class="button-edit" onclick="showEditForm(${booking.bookingId})">Sửa</button>
+            <button class="button-delete" onclick="deleteBooking(${booking.bookingId})">Xóa</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu từ API:", error);
+    }
+  }
+
+  // Format date from YYYYMMDD to DD/MM/YYYY
+  function formatDate(dateInt) {
+    const year = Math.floor(dateInt / 10000);
+    const month = Math.floor((dateInt % 10000) / 100) - 1; // Month is 0-indexed
+    const day = dateInt % 100;
+    return new Date(year, month, day).toLocaleDateString();
+  }
+
+  // Show add booking form
+  function showAddForm() {
+    document.getElementById("addBookingForm").style.display = "block";
+    document.getElementById("editBookingForm").style.display = "none"; // Hide edit form
+  }
+
+  // Hide add booking form
+  function hideAddForm() {
+    document.getElementById("addBookingForm").style.display = "none";
+  }
+
+  // Show edit booking form
+  function showEditForm(bookingId) {
+    currentBookingId = bookingId;
+    const booking = getBookingById(bookingId);
+    if (booking) {
+      document.getElementById("editBookingId").value = booking.bookingId;
+      document.getElementById("editCheckIn").value = formatDateForInput(booking.checkInDate);
+      document.getElementById("editCheckOut").value = formatDateForInput(booking.checkOutDate);
+      document.getElementById("editDepositPrice").value = booking.depositPrice;
+      document.getElementById("editTotalPrice").value = booking.totalPrice;
+      document.getElementById("editStatus").value = booking.status;
+      document.getElementById("editBookingForm").style.display = "block";
+      document.getElementById("addBookingForm").style.display = "none"; // Hide add form
+    }
+  }
+
+  // Hide edit booking form
+  function hideEditForm() {
+    document.getElementById("editBookingForm").style.display = "none";
+  }
+
+  // Save edited booking
+  async function saveBooking() {
+    const booking = {
+      bookingId: currentBookingId,
+      checkInDate: formatToDateInt(document.getElementById("editCheckIn").value),
+      checkOutDate: formatToDateInt(document.getElementById("editCheckOut").value),
+      depositPrice: parseFloat(document.getElementById("editDepositPrice").value),
+      totalPrice: parseFloat(document.getElementById("editTotalPrice").value),
+      status: parseInt(document.getElementById("editStatus").value),
+      updatedAt: formatToDateInt(new Date().toISOString().split('T')[0])
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/${currentBookingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(booking),
+      });
+
+      if (response.ok) {
+        alert("Đặt phòng đã được cập nhật thành công!");
+        hideEditForm();
+        fetchBookings();
+      } else {
+        alert("Lỗi khi cập nhật đặt phòng.");
+      }
+    } catch (error) {
+      console.error("Lỗi kết nối:", error);
+      alert("Không thể kết nối đến API.");
+    }
+  }
+
+  // Convert date to YYYYMMDD integer
+  function formatToDateInt(dateString) {
+    const date = new Date(dateString);
+    return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+  }
+
+  // Format date for input
+  function formatDateForInput(dateInt) {
+    const year = Math.floor(dateInt / 10000);
+    const month = Math.floor((dateInt % 10000) / 100) - 1; // Month is 0-indexed
+    const day = dateInt % 100;
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
+  // Delete a booking
+  async function deleteBooking(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa đặt phòng này không?")) {
+      try {
+        const response = await fetch(`${apiUrl}/${id}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          alert("Đặt phòng đã được xóa thành công!");
+          fetchBookings();
+        } else {
+          alert("Lỗi khi xóa đặt phòng.");
+        }
+      } catch (error) {
+        console.error("Lỗi khi xóa đặt phòng:", error);
+        alert("Không thể kết nối đến API.");
+      }
+    }
+  }
+
+  // Get booking by ID (mock function, replace with actual API call if needed)
+  function getBookingById(id) {
+    // This function should return the booking object from the data fetched
+    // For demo purposes, we will return a mock object
+    // Replace this with an actual fetch call if needed
+    return {
+      bookingId: id,
+      checkInDate: 20241007,
+      checkOutDate: 20241010,
+      depositPrice: 100,
+      totalPrice: 500,
+      status: 1,
+      createdAt: 20241001,
+      updatedAt: 20241001,
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", fetchBookings);
+  function logout() {
+    window.location.href = "dangnhap.html";
+  }
+</script>
+</body>
+</html>

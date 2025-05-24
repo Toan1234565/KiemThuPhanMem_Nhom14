@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phiếu Đặt Phòng</title>
+    <style>
+      body {
+        background-image: url("https://th.bing.com/th/id/OIP.7CFEqLqTv8jB_nF8mr5N2wHaHa?w=480&h=480&rs=1&pid=ImgDetMain"); /* Đường dẫn đến ảnh */
+
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+
+      .booking-form {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .booking-form h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        margin-right: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        border-color: #007bff;
+      }
+
+      .form-group textarea {
+        resize: none;
+        height: 80px;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .form-actions button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      .form-actions button:hover {
+        background-color: #0056b3;
+      }
+
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: -15px;
+        margin-bottom: 10px;
+      }
+
+      .success-message {
+        color: green;
+        text-align: center;
+        font-weight: bold;
+      }
+      #video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video-background" autoplay loop muted>
+      <source src="nhanxet.mp4" type="video/mp4" />
+      Trình duyệt của bạn không hỗ trợ video.
+    </video>
+    <!-- Form -->
+    <div class="booking-form">
+      <h2>Phiếu Đặt Phòng</h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="roomname">Tên Phòng</label>
+          <input type="text" id="roomname" readonly />
+        </div>
+        <div class="form-group">
+          <label for="address">Địa Chỉ</label>
+          <input
+            type="text"
+            id="address"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label for="price">Giá/Ngày</label>
+          <input type="text" id="price"  readonly />
+        </div>
+        
+        <div class="form-group">
+          <label for="username">Tên Người Đặt</label>
+          <input type="text" id="username"  />
+          <div class="error-message" id="nameError"></div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="text" id="email"  />
+          <div class="error-message" id="emailError"></div>
+        </div>
+        <div class="form-group">
+          <label for="phone">Số Điện Thoại</label>
+          <input type="text" id="phone" />
+          <div class="error-message" id="phoneError"></div>
+        </div>
+        <div class="form-group">
+          <label for="checkIn">Ngày Đăng Ký</label>
+          <input type="date" id="checkIn" />
+        </div>
+        <div class="form-group">
+          <label for="checkOut">Ngày Trả Phòng</label>
+          <input type="date" id="checkOut"  />
+        </div>
+        <div class="form-group">
+          <label for="totalStay">Tổng Thời Gian Lưu Trú</label>
+          <input type="text" id="totalStay" readonly />
+        </div>
+        
+        <div class="form-group">
+          <label for="totalPrice">Tổng Tiền</label>
+          <input type="text" id="totalPrice" readonly />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" onclick="xacNhan()">
+            Xác nhận đặt phòng
+          </button>
+        </div>
+      </form>
+      <div id="resultMessage" class="success-message"></div>
+    </div>
+
+    <!-- Script -->
+    <script>
+      const apiHs = "https://localhost:7246/api/Homestays";
+      async function load(){
+        var roomname1 = localStorage.getItem('room_name');
+        if(roomname1){
+          var inputroomname = document.getElementById('roomname');
+          inputroomname.value = roomname1;
+          inputroomname.readOnly = true;
+        }
+
+        var username1 = localStorage.getItem('button_username');
+        if(username1){
+          var ipusername = document.getElementById('username');
+          ipusername.value = username1;
+          ipusername.readOnly = true;
+        }
+
+        //email
+        var email = localStorage.getItem('user_email');
+        if(email){
+          var ipemail = document.getElementById('email');
+          ipemail.value = email;
+          ipemail.readOnly = true;
+        }
+
+        var phonenumber = localStorage.getItem('user_phone');
+        if(phonenumber){
+          var inphone = document.getElementById('phone');
+          inphone.value = phonenumber;
+          inphone.readOnly = true;
+        }
+        // địa chỉ
+        var idhs = localStorage.getItem('homestayId');
+        
+        try{
+          const respone_hs = await fetch(`${apiHs}/${idhs}`);
+          const hs = await respone_hs.json();
+
+          var province1 = hs.province;
+          var ward1 = hs.ward;
+          var district1 = hs.district;
+
+          var address1 = ward1 +", " + district1 +", " +province1 ;
+
+          document.getElementById('address').value = address1;
+        }catch(error){
+          console.error("lỗi", error);
+        }
+
+        // giá
+        var price2 = localStorage.getItem('room_price');
+
+        var price1 = price2 + "$";
+        if(price1){
+          var ip_price = document.getElementById('price');
+          ip_price.value = price1;
+          ip_price.readOnly = true;
+        }
+      }
+      document.getElementById('checkIn').addEventListener('change', calculateStayDuration);
+      document.getElementById('checkOut').addEventListener('change', calculateStayDuration);
+
+      function calculateStayDuration() {
+        const checkInDate = new Date(document.getElementById('checkIn').value);
+        const checkOutDate = new Date(document.getElementById('checkOut').value);
+
+        if (checkInDate && checkOutDate && checkOutDate > checkInDate) {
+          const timeDifference = checkOutDate - checkInDate; // thời gian chênh lệch tính bằng milliseconds
+          const daysDifference = timeDifference / (1000 * 60 * 60 * 24); // chuyển đổi sang ngày
+          document.getElementById('totalStay').value = daysDifference + " ngày";
+          var price3 = localStorage.getItem('room_price');
+          document.getElementById('totalPrice').value = price3 * daysDifference + "$";
+          localStorage.setItem('totalPrice',price3 * daysDifference);
+        } else {
+          document.getElementById('totalStay').value = ''; // Xóa nội dung nếu ngày không hợp lệ
+        }
+
+      }
+
+      function formatDateToLong(dateObj) {
+          const day = String(dateObj.getDate()).padStart(2, '0');
+          const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+          const year = dateObj.getFullYear();
+          return parseInt(`${year}${month}${day}`, 10); // Trả về số nguyên
+        }
+
+        function getFormattedDateAsLong() {
+                const date = new Date(); // Lấy ngày hiện tại
+                const year = date.getFullYear(); // Lấy năm (ví dụ: 2024)
+                const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Tháng (01-12)
+                const day = date.getDate().toString().padStart(2, '0'); // Ngày (01-31)
+
+                // Gộp các phần thành chuỗi "YYYYMMDD"
+                const formattedDate = `${year}${month}${day}`;
+
+                // Chuyển chuỗi thành số nguyên kiểu long
+                return parseInt(formattedDate);
+            }  
+      // thêm booking
+      const apiUs = "https://localhost:7246/api/Users/getid_username";
+      async function xacNhan() {
+        try{
+ 
+        const new_bookingID = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+        localStorage.setItem('bookking_id_', new_bookingID);
+        const checkInDate1 = new Date(document.getElementById('checkIn').value);
+        const checkOutDate1 = new Date(document.getElementById('checkOut').value);
+
+        if (!checkInDate1 || !checkOutDate1 || checkOutDate1 <= checkInDate1) {
+          alert("Ngày đăng ký và ngày trả phòng không hợp lệ.");
+          return;
+        }
+        var totalPrice1 = localStorage.getItem('totalPrice');
+        var idus = 0;
+        var name = localStorage.getItem('button_username');
+          const reponseUs = await fetch(`${apiUs}?username2=${name}`);
+          const user = await reponseUs.json();
+
+          idus = user.userId;
+        const new_booking = {
+          bookingID : new_bookingID,
+          checkInDate: formatDateToLong(checkInDate1),
+          checkOutDate: formatDateToLong(checkOutDate1),
+          depositPrice: 0,
+          totalPrice: totalPrice1,
+          status: 0,
+          createdAt: getFormattedDateAsLong(), // Example: 20241206
+          updatedAt: getFormattedDateAsLong(),
+          userId: idus,
+        }
+        
+        console.log("Booking data:", new_booking);
+
+    const apiBooking = "https://localhost:7246/api/Bookings"; // Đường dẫn API
+    const response = await fetch(apiBooking, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(new_booking),
+    });
+
+    if (response.ok) {
+      alert("Đặt phòng thành công!");
+      window.location.href = "chitiet.html"; // Điều hướng tới trang thành công
+    } else {
+      const error = await response.json();
+      console.error("Lỗi khi gửi booking:", error);
+      alert("Đặt phòng không thành công.");
+    }
+      }catch(error){
+        console.error("lỗi", error);
+      }
+    }
+      window.onload = load();
+    </script>
+  </body>
+</html>
